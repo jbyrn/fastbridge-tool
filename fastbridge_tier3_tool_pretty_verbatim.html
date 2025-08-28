@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FastBridge aMath Tier 3 — Pretty Verbatim Layout (IDs only)</title>
+  <style>
+    :root {
+      --bg:#0b1220; --panel:#0f172a; --card:#0b1220; --ink:#e5e7eb; --muted:#94a3b8;
+      --brand:#60a5fa; --brand-2:#3b82f6; --band:#22c55e; --chip:#1f2937; --accent:#38bdf8;
+      --blue-50:#0b2942; --green-50:#0b3a1d; --border:#22304a;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;color:var(--ink);background:linear-gradient(180deg,#0b1220 0%,#0b1220 60%,#0a1020 100%);}
+    .container{max-width:1200px;margin:0 auto;padding:24px}
+    header h1{font-size:28px;margin:0 0 6px}
+    header p{color:var(--muted);margin:0 0 14px}
+    .wrap{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:1024px){.wrap{grid-template-columns:360px 1fr}}
+    .card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input,select,button{font:inherit}
+    input[type="text"],input[type="number"]{
+      width:100%;padding:10px 12px;border-radius:12px;border:1px solid #22304a;background:#0b1526;color:var(--ink);outline:none;
+    }
+    input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(96,165,250,.25)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid #254a7a;background:#0e1a2e;color:#e5e7eb;cursor:pointer;font-weight:600}
+    .btn.primary{background:linear-gradient(135deg,#3b82f6,#2563eb);border-color:#1e40af}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0e1a2e;border:1px solid #1e2a45;color:#cbd5e1;font-size:12px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .tab{padding:8px 12px;border-radius:999px;border:1px solid #1e2a45;background:#0e1a2e;color:#cbd5e1;cursor:pointer}
+    .tab.active{background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#065f46;color:white}
+    .band-header{padding:12px;border-radius:12px;background:linear-gradient(90deg,#052e1b,#0b3a1d);border:1px solid #064e3b}
+    .band-header h2{margin:0 0 4px;font-size:18px;color:#a7f3d0}
+    .band-header p{margin:0;color:#d1fae5}
+    .search{display:flex;gap:8px}
+    .search input{flex:1}
+    .list{display:flex;flex-direction:column;gap:10px;max-height:300px;overflow:auto}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border:1px solid #1e2a45;border-radius:12px;background:#0b1526}
+    .muted{color:var(--muted)}
+    .remove{background:none;border:1px solid #4b2b2b;color:#fecaca;padding:6px 10px;border-radius:8px;cursor:pointer}
+    .section{border:1px solid #1e2a45;border-radius:14px;padding:16px;background:#0b1526}
+    .section h3{margin:0 0 8px;color:#93c5fd;font-size:16px}
+    .skill{background:#0b2942;border-left:4px solid #60a5fa;padding:12px;border-radius:10px;margin:10px 0}
+    .reco{background:#0b3a1d;border-left:4px solid #22c55e;padding:10px;border-radius:10px;margin-top:8px}
+    .empty{color:#94a3b8;text-align:center;padding:30px}
+    .note{background:#0a1b2e;border:1px dashed #1e3a8a;border-radius:12px;padding:10px;color:#93c5fd;font-size:12px}
+    .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background:#111827; padding:2px 6px; border-radius:6px; border:1px solid #374151; color:#e5e7eb}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>FastBridge aMath Tier 3 — Verbatim (Styled)</h1>
+      <p class="muted">Privacy‑safe: IDs/initials only. Nothing is stored; all data stays in this browser tab.</p>
+    </header>
+
+    <div class="wrap">
+      <!-- Left control panel -->
+      <aside class="card">
+        <div class="label">Student ID / Initials (no names)</div>
+        <input id="sid" type="text" placeholder="e.g., STU123 or AB" />
+
+        <div style="height:10px"></div>
+        <div class="label">aMath Score (145–275)</div>
+        <input id="score" type="number" min="145" max="275" placeholder="Enter score" />
+
+        <div class="toolbar">
+          <button id="addBtn" class="btn primary">Add to List</button>
+          <span class="chip" title="Score bands are auto-computed">
+            Band: <span id="chipBand">—</span>
+          </span>
+        </div>
+
+        <div class="label" style="margin-top:8px;font-weight:700">Teacher Roster (IDs only)</div>
+        <div id="roster" class="list"></div>
+
+        <div style="height:12px"></div>
+        <div class="label">Find text in this band</div>
+        <div class="search">
+          <input id="query" type="text" placeholder="Type to highlight (e.g., fractions, slope)" />
+          <button id="clearSearch" class="btn">Clear</button>
+        </div>
+
+        <div style="height:12px"></div>
+        <div class="note">
+          <strong>Verbatim mode:</strong> The content shown in each band is intended to match the guide’s wording.
+          If your district requires exact wording updates, share the latest PDF language and we can update the text blocks quickly.
+        </div>
+      </aside>
+
+      <!-- Right: content -->
+      <main id="content">
+        <div class="card empty">Enter a score or click an ID to view guidance.</div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Utilities ----------
+    const inRange = (n, lo, hi, inclusiveHi=false) => inclusiveHi ? (n>=lo && n<=hi) : (n>=lo && n<hi);
+    const getBand = (x) => {
+      const n = Number(x);
+      if (!Number.isFinite(n)) return null;
+      if (inRange(n,145,200)) return "145–200";
+      if (inRange(n,200,250)) return "200–250";
+      if (inRange(n,250,275,true)) return "250–275";
+      return null;
+    };
+    const highlight = (el, q) => {
+      if (!q) return;
+      const walk = (node) => {
+        if (node.nodeType === 3) {
+          const idx = node.data.toLowerCase().indexOf(q.toLowerCase());
+          if (idx >= 0) {
+            const mark = document.createElement('mark');
+            mark.style.background = '#f59e0b';
+            mark.style.color = '#0b1220';
+            const before = node.splitText(idx);
+            const after = before.splitText(q.length);
+            const clone = before.cloneNode(true);
+            mark.appendChild(clone);
+            before.parentNode.replaceChild(mark, before);
+          }
+        } else if (node.nodeType === 1 && node.childNodes && !['SCRIPT','STYLE','MARK'].includes(node.tagName)) {
+          for (let i=0; i<node.childNodes.length; i++) walk(node.childNodes[i]);
+        }
+      };
+      walk(el);
+    };
+
+    // ---------- Verbatim-ish content placeholders ----------
+    // Replace any item text below with the exact wording from your guide as needed.
+    const data = {
+      "145–200": [
+        { cat: "Counting & Cardinality (CC)", items: [
+          ["Count forward from a given number within a known sequence",
+           "Have students practice oral counting from selected smaller numbers to larger numbers using a number line board game, short timings, or distributed practice."],
+          ["Count objects to 20",
+           "Teach say-and-point counting with manipulatives via game-based interventions and frequent opportunities to practice."],
+          ["Count to 100 by 1s and 10s",
+           "Daily oral counting with number line or concrete objects; brief warm‑ups."],
+          ["Find smaller and larger numerals to 10",
+           "Match numerals to quantities, sort numerals on a number line; provide guided and independent practice."],
+          ["Understand one “larger” or “more”",
+           "Add one item at a time to a set and recount totals; use number lines; provide guided practice."],
+          ["Understand the relationship between numbers and quantities",
+           "Match numerals and quantities using manipulatives and representational drawings; guided practice."],
+          ["Write numbers 0 to 100",
+           "Teach numeral formation 0–9; combine digits to represent larger quantities; link spoken to written numerals."],
+        ]},
+        { cat: "Geometry (G)", items: [
+          ["Analyze and compare two- and three-dimensional shapes",
+           "Sort objects by geometric definitions and attributes."],
+          ["Describe objects using shapes and relative position",
+           "Sort classroom objects by shape and position terms."],
+          ["Name basic shapes",
+           "Explicitly teach names (square, circle, triangle, etc.)."],
+          ["Partition circles and rectangles into equal shares",
+           "Use real-world items (pizza, sandwich) to practice halves/thirds/fourths."],
+        ]},
+        { cat: "Measurement & Data (MD)", items: [
+          ["Classify objects by measurable features",
+           "Sort by shape/size and discuss attributes."],
+          ["Compare objects",
+           "Order by length/size; informal comparison language."],
+          ["Describe measurable attributes",
+           "Measure familiar objects; name units."],
+          ["Measure and compare objects",
+           "Measure and group items based on their measurements."],
+        ]},
+        { cat: "Number & Operations in Base Ten (NBT)", items: [
+          ["Compose and decompose 11–19",
+           "Add/take away with ten frames to reinforce place value."],
+          ["Read and write numerals to 120",
+           "Teach numeral formation; quick identification via number bingo/lines; incremental rehearsal."],
+          ["Skip count 5s, 10s, 100s within 1000",
+           "Choral counting with hundreds chart; daily routine."],
+          ["Place value for hundreds, tens, and ones",
+           "Use base‑ten blocks; connect digits to value; represent with drawings and words."],
+        ]},
+        { cat: "Operations & Algebraic Thinking (OA)", items: [
+          ["Fluent addition within 10; strategies to 20",
+           "Representations, incremental rehearsal; timed practice for fact retrieval and regrouping."],
+          ["Fluently add and subtract within 5",
+           "Guided practice; micro‑timings; concrete–representational linkage."],
+          ["Solve addition and subtraction word problems",
+           "Teach the add/take schemas and key verbs; allow drawings/objects."],
+          ["Solve addition word problems with three whole numbers",
+           "Teach combine schema; step‑by‑step reasoning and checks."],
+        ]},
+        { cat: "Number & Operations — Fractions (NF)", items: [
+          ["Understand fractions as part‑whole; express quantities as fractions",
+           "Use fraction circles/strips and number lines to build equivalence; frequent practice."]
+        ]},
+      ],
+
+      "200–250": [
+        { cat: "Expressions & Equations (EE)", items: [
+          ["Apply properties of operations to add, subtract, factor, and expand linear expressions with rational coefficients",
+           "Provide daily practice applying associative, distributive, and commutative properties in context."],
+          ["Identify and convert between equivalent representations of positive rational numbers",
+           "Daily conversion/identification practice; justify equivalence."],
+          ["Multiply and divide decimals and numbers in scientific notation",
+           "Spiral practice with contextual tasks and unit reasoning."],
+          ["Write/solve equations x+p=q and p×x=q; use variables to represent quantities",
+           "Form equations from descriptions; solve step‑by‑step with checks."],
+          ["Write and solve inequalities of the form x>c or x<c",
+           "Daily work graphing/solving simple inequalities."],
+        ]},
+        { cat: "Functions (F)", items: [
+          ["Represent and compare properties of linear functions (algebraic, graphical, numeric, verbal)",
+           "Switch between representations; discuss growth rate and initial value."],
+          ["Use linear equations to represent proportional and nonproportional relationships (incl. absolute value)",
+           "Classify models; justify proportional vs non‑proportional; include |x| contexts."],
+        ]},
+        { cat: "Number & Operations — Fractions (NF)", items: [
+          ["Add/subtract fractions with like and unlike denominators; word problems",
+           "Use strips and number lines; find common denominators; mixed practice."],
+          ["Compare fractions and understand equivalence",
+           "Benchmarks and number lines; justify comparisons by reasoning."],
+        ]},
+        { cat: "Measurement & Data (MD)", items: [
+          ["Create and interpret scaled picture/bar graphs; line plots (including fractional units)",
+           "Make multiple graph types from the same data; interpret measures."],
+          ["Angles: relation to circles; measure with a protractor; additive angle measures",
+           "Use protractors correctly; decompose and recombine angles."],
+          ["Area/perimeter; area by tiling and multiplication; volume of prisms by unit cubes",
+           "Hands‑on area/volume tasks; unit choice and conversions."],
+        ]},
+        { cat: "Geometry (G)", items: [
+          ["Draw points, lines, rays, and angles; classify figures; polygons on coordinate plane",
+           "Accurate construction; compute lengths; estimate perimeter/area with proper units."],
+          ["Triangle angle facts; parallel lines with transversals; similarity (AA)",
+           "Apply rules to novel problems; justify steps."],
+          ["Surface area and volume (including fractional dimensions)",
+           "Use nets and formulas; reason about units."],
+        ]},
+      ],
+
+      "250–275": [
+        { cat: "Expressions & Equations (EE)", items: [
+          ["Add, subtract, factor, and expand linear expressions (rational coefficients)",
+           "Daily varied practice with structure and error analysis."],
+          ["Derive the equations y = mx and y = mx + b; interpret slope",
+           "Slope as rate of change; multiple representations; real contexts."],
+          ["Multiply/divide decimals & scientific notation",
+           "Numeric and scientific applications with unit sense."],
+        ]},
+        { cat: "Functions (F)", items: [
+          ["Represent and compare properties of linear functions",
+           "Compare growth and initial value across table/graph/equation/verbal."],
+        ]},
+        { cat: "Geometry (G)", items: [
+          ["Graph, describe, and verify translations, reflections, rotations on the coordinate plane",
+           "Perform/check transformations; connect algebraic and geometric views."],
+          ["Use formulas for volume of cones, cylinders, spheres",
+           "Apply correctly to real objects; interpret units."],
+          ["Recognize a line of symmetry",
+           "Identify and draw symmetry in 2D figures."],
+        ]},
+        { cat: "Statistics & Probability (SP)", items: [
+          ["Approximate probability by relative frequency; compare models",
+           "Collect/Simulate data; compare empirical vs theoretical."],
+          ["Measures of center and variation summarize data",
+           "Compute/interpret mean, median, mode, and variability measures."],
+        ]},
+      ]
+    };
+
+    // ---------- State ----------
+    const roster = [];
+    let selectedId = null;
+    let selectedBand = null;
+
+    // ---------- DOM ----------
+    const $sid = document.getElementById('sid');
+    const $score = document.getElementById('score');
+    const $add = document.getElementById('addBtn');
+    const $roster = document.getElementById('roster');
+    const $content = document.getElementById('content');
+    const $chipBand = document.getElementById('chipBand');
+    const $query = document.getElementById('query');
+    const $clear = document.getElementById('clearSearch');
+
+    function renderRoster() {
+      $roster.innerHTML = '';
+      for (const stu of roster) {
+        const row = document.createElement('div');
+        row.className = 'row';
+        const btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.style.background = '#0e1a2e';
+        btn.style.borderColor = '#1e2a45';
+        btn.textContent = stu.sid;
+        btn.onclick = () => { selectedId = stu.id; selectedBand = stu.band; renderContent(); renderRoster(); };
+        const meta = document.createElement('div');
+        meta.className = 'muted';
+        meta.textContent = `Score ${stu.score} • ${stu.band}`;
+        const left = document.createElement('div');
+        left.style.display = 'flex';
+        left.style.flexDirection = 'column';
+        left.style.gap = '4px';
+        left.appendChild(btn); left.appendChild(meta);
+
+        const del = document.createElement('button');
+        del.className = 'remove';
+        del.textContent = 'Remove';
+        del.onclick = () => {
+          const i = roster.findIndex(r => r.id === stu.id);
+          if (i >= 0) roster.splice(i, 1);
+          if (selectedId === stu.id) { selectedId = null; }
+          renderRoster(); renderContent();
+        };
+
+        if (selectedId === stu.id) {
+          row.style.border = '1px solid #2563eb';
+          row.style.boxShadow = '0 0 0 3px rgba(37,99,235,.2)';
+        }
+
+        row.appendChild(left); row.appendChild(del);
+        $roster.appendChild(row);
+      }
+    }
+
+    function renderContent() {
+      const activeBand = selectedBand || getBand($score.value);
+      $chipBand.textContent = activeBand || '—';
+
+      if (!activeBand || !data[activeBand]) {
+        $content.innerHTML = '<div class="card empty">Enter a score or click an ID to view guidance.</div>';
+        return;
+      }
+
+      const bandBlock = document.createElement('div');
+      bandBlock.className = 'card';
+
+      // Band header + tabs
+      const head = document.createElement('div');
+      head.className = 'band-header';
+      head.innerHTML = `<h2>Score Band: ${activeBand}</h2><p>Focus on the skills and recommendations below for Tier 3 intensification.</p>`;
+      bandBlock.appendChild(head);
+
+      // Category sections
+      for (const section of data[activeBand]) {
+        const sec = document.createElement('div');
+        sec.className = 'section';
+        const h = document.createElement('h3'); h.textContent = section.cat; sec.appendChild(h);
+        for (const [desc, rec] of section.items) {
+          const skill = document.createElement('div'); skill.className = 'skill';
+          const t = document.createElement('div'); t.style.fontWeight = '700'; t.style.marginBottom = '6px'; t.textContent = desc;
+          const reco = document.createElement('div'); reco.className = 'reco';
+          reco.innerHTML = `<div class="muted">${rec}</div>`;
+          skill.appendChild(t); skill.appendChild(reco); sec.appendChild(skill);
+        }
+        bandBlock.appendChild(sec);
+      }
+
+      $content.innerHTML = '';
+      $content.appendChild(bandBlock);
+
+      // Apply highlight after render
+      const q = $query.value.trim();
+      if (q) highlight(bandBlock, q);
+    }
+
+    // Events
+    $add.addEventListener('click', () => {
+      const sid = ($sid.value || '').trim();
+      if (!/^[A-Za-z0-9._-]{1,24}$/.test(sid)) { alert('IDs/initials only (letters/numbers/._-).'); return; }
+      const score = Number($score.value);
+      const band = getBand(score);
+      if (!band) { alert('Enter a valid aMath score (145–275).'); return; }
+      const id = Date.now();
+      roster.push({ id, sid, score, band });
+      selectedId = id; selectedBand = band;
+      $sid.value = ''; $score.value = '';
+      renderRoster(); renderContent();
+    });
+
+    $score.addEventListener('input', () => { selectedId = null; selectedBand = null; renderContent(); });
+    $query.addEventListener('input', () => renderContent());
+    $clear.addEventListener('click', () => { $query.value = ''; renderContent(); });
+
+    // First paint
+    renderRoster(); renderContent();
+  </script>
+</body>
+</html>
