@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FastBridge aMath Tier 3 — No Names</title>
+  <style>
+    :root { --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#475569; --brand:#2563eb; --brand-2:#1d4ed8; --ring:rgba(37,99,235,.35); }
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--ink);background:var(--bg)}
+    .container{max-width:1120px;margin:0 auto;padding:24px}
+    h1{font-size:28px;margin:0 0 4px} .lead{color:var(--muted);margin:0 0 16px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px} @media(min-width:1024px){.grid{grid-template-columns:360px 1fr}}
+    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:12px;padding:18px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+    .label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input[type="text"],input[type="number"]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #cbd5e1;outline:none;background:#fff;color:var(--ink)}
+    input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--ring)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:10px;border:none;color:#fff;background:var(--brand);cursor:pointer;font-weight:600}
+    .btn:hover{background:var(--brand-2)} .btn:disabled{background:#94a3b8;cursor:not-allowed}
+    .list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow:auto}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
+    .meta{font-size:13px;color:var(--muted)}
+    .remove{background:none;border:none;color:#dc2626;font-size:18px;padding:6px;cursor:pointer}
+    .state{padding:10px 12px;border-radius:10px;background:#ecfdf5;border-left:4px solid #16a34a}
+    .cat{border:1px solid #e5e7eb;border-radius:12px;padding:16px;background:#fff;margin-top:12px}
+    .skill{background:#eff6ff;border-left:4px solid #93c5fd;padding:12px;border-radius:8px;margin:10px 0}
+    .reco{background:#fff;border-left:4px solid #86efac;padding:10px;border-radius:6px}
+    .empty{text-align:center;color:var(--muted);padding:40px 12px}
+    .warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:10px 12px;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FastBridge aMath Intervention Tool <span style="font-size:14px;color:#16a34a;">— No Names</span></h1>
+    <p class="lead">Use <strong>student IDs or initials only</strong>. This page stores nothing; data stays in your browser until you close.</p>
+
+    <div class="grid">
+      <aside class="card">
+        <div class="warn"><strong>Privacy:</strong> Do not enter full names. Use IDs (e.g., <code>STU123</code>) or initials (e.g., <code>AB</code>).</div>
+
+        <label class="label" for="sid">Student ID / Initials (no names)</label>
+        <input id="sid" type="text" placeholder="e.g., STU123 or AB" />
+
+        <div style="height:8px"></div>
+        <label class="label" for="score">aMath Score (145–275)</label>
+        <input id="score" type="number" min="145" max="275" placeholder="Enter score" />
+
+        <div style="height:12px"></div>
+        <button id="addBtn" class="btn">Add</button>
+
+        <div style="height:18px"></div>
+        <div class="label" style="font-weight:700">Student List</div>
+        <div id="roster" class="list"></div>
+      </aside>
+
+      <main id="results">
+        <div class="card empty">Enter a score or select an ID to view Tier 3 targets and recommendations.</div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Simple pattern to block likely full names with spaces; allow IDs/initials
+    const isIdOrInitials = (s) => /^[A-Za-z0-9._-]{1,16}$/.test(String(s||'').trim());
+
+    const skillData = {
+      "145-200": { categories: [
+        { category: "Counting & Cardinality (CC)", skills: [
+          { description: "Count forward within a known sequence", recommendations: "Oral counting; number line games; 1‑minute timings; distributed practice." },
+          { description: "Count objects to 20", recommendations: "Say‑and‑point with manipulatives; game‑based counting; frequent short practice." },
+          { description: "Count to 100 by 1s and 10s", recommendations: "Daily oral counting; ten‑frames; warmups." },
+        ]},
+        { category: "Number & Operations in Base Ten (NBT)", skills: [
+          { description: "Compose/decompose 11–19", recommendations: "Ten frames; build & take away; connect to place value." },
+          { description: "Place value: hundreds/tens/ones", recommendations: "Base‑ten blocks; represent with drawings and words." },
+        ]},
+      ]},
+      "200-250": { categories: [
+        { category: "Number & Operations — Fractions (NF)", skills: [
+          { description: "Add/subtract fractions (like & unlike denoms)", recommendations: "Fraction strips; common denominators; daily mixed practice." },
+          { description: "Compare fractions & equivalence", recommendations: "Number lines; benchmarks; justify comparisons." },
+        ]},
+        { category: "Expressions & Equations (EE)", skills: [
+          { description: "Properties with linear expressions", recommendations: "Daily practice with associative/distributive/commutative." },
+        ]},
+      ]},
+      "250-275": { categories: [
+        { category: "Functions (F)", skills: [
+          { description: "Linear functions across reps", recommendations: "Compare table/graph/rule; rate & initial value." },
+        ]},
+        { category: "Geometry (G)", skills: [
+          { description: "Volume of cones/cylinders/spheres", recommendations: "Formula choice; unit fluency; contextual tasks." },
+        ]},
+      ]}
+    };
+
+    const inRange = (n, lo, hi, inclusiveHi=false) => inclusiveHi ? (n>=lo && n<=hi) : (n>=lo && n<hi);
+    const getScoreRange = (raw) => {
+      const num = Number(raw);
+      if (!Number.isFinite(num)) return null;
+      if (inRange(num,145,200)) return "145-200";
+      if (inRange(num,200,250)) return "200-250";
+      if (inRange(num,250,275,true)) return "250-275";
+      return null;
+    };
+
+    const roster = []; let selectedId = null;
+    const $sid = document.getElementById('sid');
+    const $score = document.getElementById('score');
+    const $add = document.getElementById('addBtn');
+    const $roster = document.getElementById('roster');
+    const $results = document.getElementById('results');
+
+    function renderRoster(){
+      $roster.innerHTML='';
+      roster.forEach(stu=>{
+        const row=document.createElement('div'); row.className='row';
+        const btn=document.createElement('button'); btn.type='button';
+        btn.style.cssText='background:none;border:none;text-align:left;flex:1;cursor:pointer;';
+        btn.onclick=()=>{selectedId=stu.id; renderResults(); renderRoster();};
+        btn.innerHTML=`<div style="font-weight:600">${escapeHtml(stu.sid)}</div>
+          <div class="meta">Score: ${stu.score} • ${stu.scoreRange}</div>`;
+        const del=document.createElement('button'); del.className='remove'; del.title='Remove'; del.innerHTML='&times;';
+        del.onclick=()=>{ const i=roster.findIndex(s=>s.id===stu.id); if(i>=0) roster.splice(i,1); if(selectedId===stu.id) selectedId=null; renderRoster(); renderResults(); };
+        if(selectedId===stu.id) row.style.border='1px solid var(--brand)';
+        row.appendChild(btn); row.appendChild(del); $roster.appendChild(row);
+      });
+    }
+
+    function renderResults(){
+      const current = (()=>{
+        if(selectedId){ const s=roster.find(r=>r.id===selectedId); return s ? s.scoreRange : null; }
+        return getScoreRange($score.value);
+      })();
+      const data = current ? skillData[current] : null;
+      if(!data){ $results.innerHTML='<div class="card empty">Enter a score or select an ID to view Tier 3 targets and recommendations.</div>'; return; }
+      const sid = selectedId ? (roster.find(r=>r.id===selectedId)?.sid || '') : '';
+      const header = `<div class="state card">Score Range: <strong>${current}</strong>${sid ? ` <span class="meta">(ID: ${escapeHtml(sid)})</span>`:''}</div>`;
+      const cats = data.categories.map(c=>`
+        <section class="cat">
+          <h3>${escapeHtml(c.category)}</h3>
+          ${c.skills.map(s=>`
+            <div class="skill">
+              <div style="font-weight:600;margin-bottom:4px;">${escapeHtml(s.description)}</div>
+              <div class="reco"><div class="meta">${escapeHtml(s.recommendations)}</div></div>
+            </div>
+          `).join('')}
+        </section>
+      `).join('');
+      $results.innerHTML = header + '<div style="height:12px"></div>' + cats;
+    }
+
+    $add.addEventListener('click',()=>{
+      const sid=($sid.value||'').trim();
+      if(!isIdOrInitials(sid)){ alert('Use IDs/initials only (letters/numbers/._-). No spaces or full names.'); return; }
+      const sc=Number($score.value); const sr=getScoreRange(sc);
+      if(sr===null){ alert('Enter a valid aMath score (145–275).'); return; }
+      const stu={ id:Date.now(), sid, score:sc, scoreRange:sr };
+      roster.push(stu); selectedId=stu.id; $sid.value=''; $score.value=''; renderRoster(); renderResults();
+    });
+
+    $score.addEventListener('input',()=>{ selectedId=null; renderResults(); });
+
+    function escapeHtml(str){return String(str).replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]))}
+
+    renderRoster(); renderResults();
+  </script>
+</body>
+</html>
